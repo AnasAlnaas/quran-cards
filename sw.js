@@ -3,7 +3,7 @@
    السياسة: ملفات الموقع «الشبكة أولاً» حتى يظهر أي تحديث فور رفعه،
             والذاكرة احتياطٌ عند الانقطاع. الخطوط «الذاكرة أولاً».
    =========================================================== */
-const CACHE = 'quran-cards-v2';
+const CACHE = 'quran-cards-v3';
 const SHELL = [
   '/', '/index.html', '/game.js', '/gen.js', '/cards.js', '/mushaf.js',
   '/fonts/qaloon.10.woff2', '/fonts/hafs.18.woff2',

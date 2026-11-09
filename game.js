@@ -108,24 +108,56 @@ const fmt = s => esc(s)
   .replace(/\uE000([^\uE001]*)\uE001/g, (_, m) => `<span class="ay w">${m}</span>`)
   .replace(/«[^»]*»/g, m => `<span class="dz">${m}</span>`);
 
-/* نجمة ثمانية (خاتم) من مربّعين متقاطعين، كعلامة الأحزاب في المصحف:
-   مخطّطة على ظهر البطاقة، ومصمتة في الشعار الصغير */
-function star(solid){
+/* الشمسة: الحلية المستديرة التي تُفتتح بها المصاحف المذهّبة —
+   أربعة وعشرون شعاعاً حول دائرة مفصّصة، وفي وسطها زهرة ثمانية.
+   مخطّطة على ظهر البطاقة، ومصمتة في الشعار الصغير (ورسمها في favicon.svg مثلها). */
+const SH = {
+  pt: (r, a) => [50 + r * Math.sin(a), 50 - r * Math.cos(a)],
+  f:  n => n.toFixed(2),
+  rays(n, ro, ri){                                   // نجمة الأشعة
+    let d = '';
+    for(let i = 0; i < 2 * n; i++){
+      const [x, y] = SH.pt(i % 2 ? ri : ro, i * Math.PI / n);
+      d += (i ? 'L' : 'M') + SH.f(x) + ' ' + SH.f(y);
+    }
+    return `<path d="${d}Z"/>`;
+  },
+  scallop(R, n, b){                                  // دائرة بفصوص بارزة إلى الخارج
+    const r = R * Math.sin(Math.PI / n) * b;
+    let d = '';
+    for(let i = 0; i <= n; i++){
+      const [x, y] = SH.pt(R, i * 2 * Math.PI / n);
+      d += i ? `A${SH.f(r)} ${SH.f(r)} 0 0 1 ${SH.f(x)} ${SH.f(y)}` : `M${SH.f(x)} ${SH.f(y)}`;
+    }
+    return `<path d="${d}Z"/>`;
+  },
+  leaves(n, r0, r1, w){                              // بتلات مدبّبة
+    let s = '';
+    const m = (r0 + r1) / 2, dw = w / m;
+    for(let i = 0; i < n; i++){
+      const a = i * 2 * Math.PI / n;
+      const [x0, y0] = SH.pt(r0, a), [x1, y1] = SH.pt(r1, a), [xa, ya] = SH.pt(m, a - dw), [xb, yb] = SH.pt(m, a + dw);
+      s += `<path d="M${SH.f(x0)} ${SH.f(y0)}Q${SH.f(xa)} ${SH.f(ya)} ${SH.f(x1)} ${SH.f(y1)}Q${SH.f(xb)} ${SH.f(yb)} ${SH.f(x0)} ${SH.f(y0)}Z"/>`;
+    }
+    return s;
+  }
+};
+function shamsa(solid){
   const c = '#FFFFFF';
-  const sq = `<rect x="22" y="22" width="56" height="56" rx="3"/>`;
-  const p = sq + `<g transform="rotate(45 50 50)">${sq}</g>`;
+  const rays = SH.rays(24, 46, 37), lobes = SH.scallop(28, 12, 1.15);
   return solid
     ? `<svg viewBox="0 0 100 100" aria-hidden="true">
-        <g fill="${c}" fill-opacity=".55">${p}</g>
-        <circle cx="50" cy="50" r="12" fill="${c}"/></svg>`
+        <g fill="${c}" fill-opacity=".5" stroke="${c}" stroke-width="2.2" stroke-linejoin="round">${rays}${lobes}</g>
+        <circle cx="50" cy="50" r="7" fill="${c}"/></svg>`
     : `<svg viewBox="0 0 100 100" aria-hidden="true">
-        <g fill="none" stroke="${c}" stroke-width="2">${p}</g>
-        <circle cx="50" cy="50" r="46" fill="none" stroke="${c}" stroke-width="1.4" stroke-opacity=".5"/>
-        <circle cx="50" cy="50" r="16" fill="none" stroke="${c}" stroke-width="1.6"/>
-        <circle cx="50" cy="50" r="6" fill="${c}"/></svg>`;
+        <g fill="none" stroke="${c}" stroke-width="1.6" stroke-linejoin="round">
+          <circle cx="50" cy="50" r="48" stroke-opacity=".45"/>${rays}
+          <circle cx="50" cy="50" r="33"/>${lobes}${SH.leaves(8, 7, 23, 5)}
+          <circle cx="50" cy="50" r="5"/></g>
+        <circle cx="50" cy="50" r="4" fill="${c}"/></svg>`;
 }
-const EMBLEM = star(false);
-const MARK   = star(true);
+const EMBLEM = shamsa(false);
+const MARK   = shamsa(true);
 const show = id => document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
 /* بطاقة زائدة دائماً على عدد اللاعبين، فيختار آخر لاعب أيضاً ولا تُفرض عليه البطاقة الأخيرة */
 const cardsPerLevel = () => Math.max(4, nPlayers + 1);
