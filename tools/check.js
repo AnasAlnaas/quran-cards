@@ -22,7 +22,7 @@ const errors = [];
 if (/﴿/.test(load('cards.js').replace(/\/\*[\s\S]*?\*\//g, '')))
   errors.push('cards.js: نصّ قرآني مكتوب يدوياً بين ﴿﴾ — استعمل مفتاح {{…}}');
 
-const JUZ = [25, 26, 27, 28, 29, 30];
+const JUZ = [23, 24, 25, 26, 27, 28, 29, 30];
 const verbatim = {};
 for (const rw of ['q', 'h']) {
   const set = new Set();

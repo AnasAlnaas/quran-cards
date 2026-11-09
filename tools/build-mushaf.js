@@ -15,11 +15,11 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
-/* Juz in the game: 25–30. Juz 25 starts inside Fussilat (41), so the whole
-   surah is included (its earlier ayat are marked juz 24): they serve as
+/* Juz in the game: 23–30. Juz 23 starts inside Ya-Sin (36), so the whole
+   surah is included (its earlier ayat are marked juz 22): they serve as
    context and wrong options, and get no cards of their own.
    Lower this when more sections leave "soon". */
-const FIRST_SURA = 41;
+const FIRST_SURA = 36;
 
 const SOURCES = {
   q: { file: 'QaloonData_v10.json', sura: 'sura_no', name: 'sura_name_ar', label: 'رواية قالون عن نافع', ver: 'KFGQPC Qaloon v10' },
