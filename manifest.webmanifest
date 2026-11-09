@@ -8,8 +8,8 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#0B1613",
-  "theme_color": "#0B1613",
+  "background_color": "#03040A",
+  "theme_color": "#03040A",
   "categories": ["education", "games"],
   "icons": [
     { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },

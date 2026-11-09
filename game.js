@@ -106,7 +106,7 @@ const fmt = s => esc(s)
 /* نجمة ثمانية (خاتم) من مربّعين متقاطعين، كعلامة الأحزاب في المصحف:
    مخطّطة على ظهر البطاقة، ومصمتة في الشعار الصغير */
 function star(solid){
-  const c = '#E7B24A';
+  const c = '#FFFFFF';
   const sq = `<rect x="22" y="22" width="56" height="56" rx="3"/>`;
   const p = sq + `<g transform="rotate(45 50 50)">${sq}</g>`;
   return solid
@@ -1196,6 +1196,37 @@ function setBig(v){
   el.setAttribute('aria-checked', String(v));
 }
 
+/* ================= سماء الليل =================
+   نجوم بأحجام وإضاءات مختلفة على لوحة ثابتة، وعددها بحسب مساحة الشاشة؛
+   تُرسم مرّة وتُعاد عند تغيّر المقاس فقط. وبضع نجوم تتلألأ بـCSS. */
+function drawSky(){
+  const cv = $('sky');
+  if(!cv || !cv.getContext) return;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const w = window.innerWidth, h = window.innerHeight;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  const x = cv.getContext('2d');
+  x.setTransform(dpr, 0, 0, dpr, 0, 0);
+  x.clearRect(0, 0, w, h);
+  const n = Math.round(w * h / 2600);
+  for(let i = 0; i < n; i++){
+    const r = Math.random() < .92 ? Math.random() * .8 + .25 : Math.random() * .9 + 1;
+    x.globalAlpha = Math.random() * .6 + (r > 1 ? .4 : .15);
+    /* معظمها أبيض، وقليل منها مائل إلى الزرقة أو الدفء كالنجوم الحقيقية */
+    const t = Math.random();
+    x.fillStyle = t < .1 ? '#CFE0FF' : t < .16 ? '#FFE9D2' : '#FFFFFF';
+    x.beginPath(); x.arc(Math.random() * w, Math.random() * h, r, 0, Math.PI * 2); x.fill();
+  }
+  x.globalAlpha = 1;
+}
+function placeTwinkles(){
+  const box = $('twinkles');
+  if(!box) return;
+  box.innerHTML = Array.from({length: 14}, () =>
+    `<span class="twinkle" style="top:${(Math.random()*96+2).toFixed(1)}%;left:${(Math.random()*96+2).toFixed(1)}%;` +
+    `--tw:${(3 + Math.random()*4).toFixed(1)}s;--td:${(-Math.random()*6).toFixed(1)}s"></span>`).join('');
+}
+
 /* ================= التشغيل ================= */
 function fatal(msg){
   const box = document.querySelector('#setup .panel');
@@ -1211,6 +1242,7 @@ function fatal(msg){
 
 function boot(){
   document.querySelectorAll('[data-mark]').forEach(el => { el.innerHTML = MARK; });
+  drawSky(); placeTwinkles();
   if(typeof MUSHAF === 'undefined' || typeof HAND === 'undefined' || typeof QGEN === 'undefined'){
     fatal('لم تصل ملفات المصحف والأسئلة. تحقّق من الاتصال بالإنترنت ثم أعد المحاولة.');
     return;
@@ -1233,7 +1265,9 @@ function boot(){
   offerResume();
 
   let lastNarrow = narrow();
+  let skyT = null;
   window.addEventListener('resize', () => {
+    clearTimeout(skyT); skyT = setTimeout(drawSky, 150);   // السماء تُعاد بعد انتهاء تغيير المقاس
     const n = narrow();
     if(n === lastNarrow) return;   // تغيّر الارتفاع فقط (شريط عنوان الجوال) — لا تُعِد بناء اللوح
     lastNarrow = n;
