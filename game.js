@@ -33,8 +33,15 @@ const JUZ_NAMES = ["الم","سيقول","تلك الرسل","لن تنالوا"
   "قال الملأ","واعلموا","يعتذرون","وما من دابة","وما أبرئ","ربما","سبحان","قال ألم","اقترب","قد أفلح",
   "وقال الذين","أمّن خلق","اتل ما أوحي","ومن يقنت","وما لي","فمن أظلم","إليه يرد","حم","قال فما خطبكم",
   "قد سمع","تبارك","عمّ"];
-const JUZ_READY = [30, 29];
+const JUZ_READY = [30, 29, 28, 27, 26, 25];
 const juzLabel = j => `جزء ${JUZ_NAMES[j - 1]}`;
+/* في الشريط العلوي: الأسماء إن كانا جزأين أو أقلّ، وإلا الأرقام («الأجزاء ٢٥–٣٠» إن تتابعت) */
+function juzSummary(list){
+  const j = list.slice().sort((x, y) => x - y);
+  if(j.length <= 2) return j.slice().reverse().map(juzLabel).join('، ');
+  const run = j.every((x, i) => i === 0 || x === j[i - 1] + 1);
+  return 'الأجزاء ' + (run ? `${toAr(j[0])}–${toAr(j[j.length - 1])}` : j.map(toAr).join('، '));
+}
 /* درجة الحديث تظهر شارةً بعد الإجابة وفي المراجعة (للبطاقات التي فيها حديث) */
 const GRADES = {
   mt:{label:"متفق عليه",   cls:"g-mt"},
@@ -332,12 +339,23 @@ function bindChip(id, get, set){
 /* ================= إدارة بنك الأسئلة ================= */
 const poolFor = tierKey => BANK[tierKey];
 /* بالتناوب بين الأنواع: سؤال من كل نوع في كل دورة، فلا يطغى نوعٌ كثير البطاقات
-   («في أيّ سورة؟» مئات) على الأنواع القليلة كالمعاني والقصص */
-function interleave(list){
+   («في أيّ سورة؟» مئات) على الأنواع القليلة */
+function byKind(list){
   const by = {};
   shuffle(list).forEach(q => (by[q.k] = by[q.k] || []).push(q));
   const lanes = Object.values(by), out = [];
   while(lanes.some(l => l.length)) shuffle(lanes).forEach(l => { if(l.length) out.push(l.shift()); });
+  return out;
+}
+/* الحفظ أولاً: ثلاث بطاقات حفظ ثم بطاقة معرفة (معانٍ، قصص، من القائل، فضائل،
+   عدد الآيات، ترتيب السور)، حتى تنفد بطاقات المعرفة */
+const MEMO_RUN = 3;
+function interleave(list){
+  const memo = byKind(list.filter(q => q.m)), other = byKind(list.filter(q => !q.m)), out = [];
+  while(memo.length || other.length){
+    for(let n = 0; n < MEMO_RUN && memo.length; n++) out.push(memo.shift());
+    if(other.length) out.push(other.shift());
+  }
   return out;
 }
 function orderPool(list){
@@ -403,7 +421,7 @@ function renderHUD(){
   const tier = TIERS[tierOf(level)];
   $('stage').innerHTML =
     `${LEVELS[level]}<span class="tag t${tierOf(level)}">${tier.label}</span>` +
-    `<small>المرحلة ${toAr(level+1)} من ${toAr(nLevels)} · رواية ${RIWAYAT.find(r => r.k === rw).label} · ${juz.map(juzLabel).join('، ')}</small>`;
+    `<small>المرحلة ${toAr(level+1)} من ${toAr(nLevels)} · رواية ${RIWAYAT.find(r => r.k === rw).label} · ${juzSummary(juz)}</small>`;
   $('rail').innerHTML = Array.from({length:nLevels}, (_,i) =>
     `<span class="bar ${i<level?'done':''} ${i===level?'now':''}"></span>`).join('');
 }

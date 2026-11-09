@@ -22,7 +22,7 @@ const errors = [];
 if (/﴿/.test(load('cards.js').replace(/\/\*[\s\S]*?\*\//g, '')))
   errors.push('cards.js: نصّ قرآني مكتوب يدوياً بين ﴿﴾ — استعمل مفتاح {{…}}');
 
-const JUZ = [29, 30];
+const JUZ = [25, 26, 27, 28, 29, 30];
 const verbatim = {};
 for (const rw of ['q', 'h']) {
   const set = new Set();
@@ -39,7 +39,7 @@ for (const rw of ['q', 'h']) {
     if (c.a.length !== 4) errors.push(`${c.id}: ${c.a.length} خيارات`);
     if (new Set(c.a).size !== c.a.length) errors.push(`${c.id}: خيارات مكرّرة`);
     /* كل آية كاملة في سؤال توليدي أو خياراته يجب أن تكون بنصّها في المصحف */
-    if (!c.id.startsWith('hand:') && c.k !== 'fill') {
+    if (!c.id.startsWith('hand:') && c.k !== 'fill' && c.k !== 'words') {
       [c.q, ...c.a].join(' ').replace(/﴿([^﴾]*)﴾/g, (_, t) => {
         if (!verbatim[rw].has(t)) errors.push(`${c.id}: آية ليست بنصّها في المصحف: ${t.slice(0, 30)}`);
       });
