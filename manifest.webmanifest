@@ -1,0 +1,18 @@
+{
+  "name": "بطاقات القرآن",
+  "short_name": "بطاقات القرآن",
+  "description": "لعبة بطاقات تفاعلية في حفظ القرآن الكريم للحلقات والصفوف، برواية قالون أو حفص.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0B1613",
+  "theme_color": "#0B1613",
+  "categories": ["education", "games"],
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
